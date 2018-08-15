@@ -9,15 +9,14 @@ const strategy = new Auth0Strategy(
     domain: keys.domain,
     clientID: keys.clientID,
     clientSecret: keys.clientSecret,
-    callbackURL: "http://localhost:5000/callback"
+    callbackURL: "/api/callback"
   },
   async (accessToken, refreshToken, extraParams, profile, done) => {
-    const existingUser = await User.findOne({ googleId: profile.id });
-
+    const existingUser = await User.findOne({ auth0Profile: profile });
     if (existingUser) {
       done(null, existingUser);
     } else {
-      const user = await new User({ auth0Id: profile.id }).save();
+      const user = await new User({ auth0Profile: profile }).save();
       done(null, user);
     }
   }
